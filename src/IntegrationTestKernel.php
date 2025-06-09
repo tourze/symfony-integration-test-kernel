@@ -59,8 +59,8 @@ class IntegrationTestKernel extends BaseKernel
             ]);
         }
 
-        // EasyAdmin需要开启路由
-        if ($container->hasExtension('easy_admin')) {
+        // 部分模块，是需要强制开启路由能力的
+        if ($container->hasExtension('easy_admin') || $container->hasExtension('routing_auto_loader')) {
             $container->prependExtensionConfig('framework', [
                 'router' => [
                     'resource' => __DIR__ . '/../config/routes.yaml',
