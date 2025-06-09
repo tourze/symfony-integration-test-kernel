@@ -2,6 +2,7 @@
 
 namespace Tourze\IntegrationTestKernel;
 
+use Composer\InstalledVersions;
 use Symfony\Bundle\FrameworkBundle\FrameworkBundle;
 use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -52,11 +53,15 @@ class IntegrationTestKernel extends BaseKernel
                 'validation' => [
                     'email_validation_mode' => 'html5',
                 ],
-                'uid' => [
-                    'default_uuid_version' => 7,
-                    'time_based_uuid_version' => 7,
-                ],
             ]);
+            if (InstalledVersions::isInstalled('symfony/uid')) {
+                $container->prependExtensionConfig('framework', [
+                    'uid' => [
+                        'default_uuid_version' => 7,
+                        'time_based_uuid_version' => 7,
+                    ],
+                ]);
+            }
         }
 
         // 部分模块，是需要强制开启路由能力的
