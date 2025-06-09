@@ -50,15 +50,19 @@ class IntegrationTestKernel extends BaseKernel
                 'php_errors' => [
                     'log' => true,
                 ],
-                'validation' => [
-                    'email_validation_mode' => 'html5',
-                ],
             ]);
             if (InstalledVersions::isInstalled('symfony/uid')) {
                 $container->prependExtensionConfig('framework', [
                     'uid' => [
                         'default_uuid_version' => 7,
                         'time_based_uuid_version' => 7,
+                    ],
+                ]);
+            }
+            if (InstalledVersions::isInstalled('symfony/validator')) {
+                $container->prependExtensionConfig('framework', [
+                    'validation' => [
+                        'email_validation_mode' => 'html5',
                     ],
                 ]);
             }
