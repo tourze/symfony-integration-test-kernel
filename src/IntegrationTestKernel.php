@@ -3,6 +3,7 @@
 namespace Tourze\IntegrationTestKernel;
 
 use Composer\InstalledVersions;
+use Doctrine\ORM\Tools\SchemaTool;
 use Symfony\Bundle\FrameworkBundle\FrameworkBundle;
 use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -123,5 +124,28 @@ class IntegrationTestKernel extends BaseKernel
     public function registerContainerConfiguration(LoaderInterface $loader): void
     {
         $loader->load($this->configureContainer(...));
+    }
+
+    public function boot(): void
+    {
+        // 清空 cache 目录
+        @rmdir($this->getCacheDir());
+
+        parent::boot();
+        if (isset($this->getContainer()->getParameter('kernel.bundles')['DoctrineBundle'])) {
+            $this->createDatabaseSchema();
+        }
+    }
+
+    private function createDatabaseSchema(): void
+    {
+        $entityManager = $this->getContainer()->get('doctrine.orm.entity_manager');
+        $schemaTool = new SchemaTool($entityManager);
+
+        // 获取所有实体的元数据
+        $metadata = $entityManager->getMetadataFactory()->getAllMetadata();
+
+        // 创建数据库表
+        $schemaTool->createSchema($metadata);
     }
 }
