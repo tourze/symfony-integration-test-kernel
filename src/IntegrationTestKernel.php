@@ -39,7 +39,7 @@ class IntegrationTestKernel extends BaseKernel
         return sys_get_temp_dir() . '/var/log';
     }
 
-    private function configureContainer(ContainerBuilder $container): void
+    protected function configureContainer(ContainerBuilder $container): void
     {
         // 基础框架
         if ($container->hasExtension('framework')) {
@@ -123,7 +123,9 @@ class IntegrationTestKernel extends BaseKernel
 
     public function registerContainerConfiguration(LoaderInterface $loader): void
     {
-        $loader->load($this->configureContainer(...));
+        $loader->load(function (ContainerBuilder $container) {
+            $this->configureContainer($container);
+        });
     }
 
     public function boot(): void
