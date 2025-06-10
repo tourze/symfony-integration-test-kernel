@@ -3,7 +3,9 @@
 namespace Tourze\IntegrationTestKernel;
 
 use Composer\InstalledVersions;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Tools\SchemaTool;
+use Doctrine\ORM\Tools\ToolsException;
 use Symfony\Bundle\FrameworkBundle\FrameworkBundle;
 use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -135,13 +137,18 @@ class IntegrationTestKernel extends BaseKernel
 
         parent::boot();
         if (isset($this->getContainer()->getParameter('kernel.bundles')['DoctrineBundle'])) {
-            $this->createDatabaseSchema();
+            try {
+                $this->createDatabaseSchema();
+            } catch (ToolsException $exception) {
+                // 吃掉异常
+            }
         }
     }
 
     private function createDatabaseSchema(): void
     {
         $entityManager = $this->getContainer()->get('doctrine.orm.entity_manager');
+        assert($entityManager instanceof EntityManagerInterface);
         $schemaTool = new SchemaTool($entityManager);
 
         // 获取所有实体的元数据
