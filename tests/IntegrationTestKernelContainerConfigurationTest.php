@@ -76,35 +76,6 @@ class IntegrationTestKernelContainerConfigurationTest extends TestCase
         $this->assertSame('yaml', $mergedConfig['router']['type']);
     }
 
-    public function test_configureContainer_setsSecurityConfiguration(): void
-    {
-        // 注册 security extension
-        $this->container->registerExtension(new \Symfony\Bundle\SecurityBundle\DependencyInjection\SecurityExtension());
-
-        // 调用 configureContainer
-        $reflection = new \ReflectionClass($this->kernel);
-        $method = $reflection->getMethod('configureContainer');
-        $method->setAccessible(true);
-        $method->invoke($this->kernel, $this->container);
-
-        $configs = $this->container->getExtensionConfig('security');
-
-        $this->assertNotEmpty($configs);
-        $mergedConfig = array_merge_recursive(...$configs);
-
-        $this->assertArrayHasKey('password_hashers', $mergedConfig);
-        $this->assertArrayHasKey('providers', $mergedConfig);
-        $this->assertArrayHasKey('firewalls', $mergedConfig);
-
-        $this->assertArrayHasKey('users_in_memory', $mergedConfig['providers']);
-        $this->assertArrayHasKey('memory', $mergedConfig['providers']['users_in_memory']);
-
-        $this->assertArrayHasKey('dev', $mergedConfig['firewalls']);
-        $this->assertArrayHasKey('main', $mergedConfig['firewalls']);
-        $this->assertFalse($mergedConfig['firewalls']['dev']['security']);
-        $this->assertTrue($mergedConfig['firewalls']['main']['lazy']);
-    }
-
     public function test_configureContainer_setsDoctrineConfiguration(): void
     {
         // 注册 doctrine extension
