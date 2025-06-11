@@ -17,13 +17,18 @@ class IntegrationTestKernel extends BaseKernel
 {
     private string $hash;
 
-    public function __construct(string $environment, bool $debug, private readonly array $appendBundles = [])
-    {
+    public function __construct(
+        string $environment,
+        bool $debug,
+        private readonly array $appendBundles = [],
+        private readonly array $entityMappings = []
+    ) {
         parent::__construct($environment, $debug);
         $this->hash = md5(json_encode([
             $environment,
             $debug,
             $this->appendBundles,
+            $this->entityMappings,
         ]));
     }
 
@@ -118,7 +123,7 @@ class IntegrationTestKernel extends BaseKernel
         }
 
         if ($container->hasExtension('doctrine')) {
-            $container->prependExtensionConfig('doctrine', [
+            $doctrineConfig = [
                 'dbal' => [
                     'driver' => 'pdo_sqlite',
                     'url' => 'sqlite:///:memory:',
@@ -131,7 +136,23 @@ class IntegrationTestKernel extends BaseKernel
                     'naming_strategy' => 'doctrine.orm.naming_strategy.underscore_number_aware',
                     'auto_mapping' => true,
                 ]
-            ]);
+            ];
+
+            // 添加自定义实体映射配置
+            if (!empty($this->entityMappings)) {
+                $mappings = [];
+                foreach ($this->entityMappings as $namespace => $path) {
+                    $mappings[$namespace] = [
+                        'type' => 'attribute',
+                        'dir' => $path,
+                        'prefix' => $namespace,
+                        'is_bundle' => false,
+                    ];
+                }
+                $doctrineConfig['orm']['mappings'] = $mappings;
+            }
+
+            $container->prependExtensionConfig('doctrine', $doctrineConfig);
         }
     }
 
