@@ -15,9 +15,21 @@ use Tourze\BundleDependency\ResolveHelper;
 
 class IntegrationTestKernel extends BaseKernel
 {
+    private string $hash;
+
     public function __construct(string $environment, bool $debug, private readonly array $appendBundles = [])
     {
         parent::__construct($environment, $debug);
+        $this->hash = md5(json_encode([
+            $environment,
+            $debug,
+            $this->appendBundles,
+        ]));
+    }
+
+    private function getHash(): string
+    {
+        return $this->hash;
     }
 
     public function registerBundles(): iterable
@@ -33,12 +45,12 @@ class IntegrationTestKernel extends BaseKernel
 
     public function getCacheDir(): string
     {
-        return sys_get_temp_dir() . '/var/cache/' . $this->environment;
+        return sys_get_temp_dir() . "/{$this->getHash()}/var/cache/" . $this->environment;
     }
 
     public function getLogDir(): string
     {
-        return sys_get_temp_dir() . '/var/log';
+        return sys_get_temp_dir() . "/{$this->getHash()}/var/log";
     }
 
     protected function configureContainer(ContainerBuilder $container): void
