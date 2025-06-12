@@ -13,10 +13,37 @@ use Symfony\Component\HttpKernel\Kernel as BaseKernel;
 use Symfony\Component\Security\Core\User\InMemoryUser;
 use Tourze\BundleDependency\ResolveHelper;
 
+/**
+ * 测试内核类
+ *
+ * 用于集成测试的 Symfony 内核实现。
+ * 主要功能:
+ * - 支持动态添加 Bundle
+ * - 支持动态添加实体映射
+ * - 自动解析 Bundle 依赖
+ * - 提供临时缓存和日志目录
+ * - 支持基础框架配置documented class
+ */
 class IntegrationTestKernel extends BaseKernel
 {
     private string $hash;
 
+    /**
+     * 构造函数
+     *
+     * @param string $environment 环境名称,如 'test', 'dev' 等
+     * @param bool $debug 是否开启调试模式
+     * @param array $appendBundles 要额外加载的 Bundle 配置,格式如:
+     *     [
+     *         BundleClass::class => ['all' => true],
+     *         OtherBundle::class => ['dev' => true]
+     *     ]
+     * @param array $entityMappings 要额外添加的实体映射配置,格式如:
+     *     [
+     *         'Tourze\Bundle\Tests\Entity' => __DIR__ . '/../Entity',
+     *         'Tourze\Other\Entity' => '/path/to/entity/dir'
+     *     ]
+     */
     public function __construct(
         string $environment,
         bool $debug,
