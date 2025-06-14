@@ -116,7 +116,7 @@ class IntegrationTestKernel extends BaseKernel
         }
 
         // 部分模块，是需要强制开启路由能力的
-        if ($container->hasExtension('easy_admin') || $container->hasExtension('routing_auto_loader')) {
+        if ($container->hasExtension('easy_admin') || $container->hasExtension('routing_auto_loader') || $container->hasExtension('security')) {
             $container->prependExtensionConfig('framework', [
                 'router' => [
                     'resource' => __DIR__ . '/../config/routes.yaml',
