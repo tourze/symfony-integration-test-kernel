@@ -97,6 +97,9 @@ class IntegrationTestKernel extends BaseKernel
                 'php_errors' => [
                     'log' => true,
                 ],
+                'cache' => [
+                    'app' => 'cache.adapter.array',
+                ],
             ]);
             if (InstalledVersions::isInstalled('symfony/uid')) {
                 $container->prependExtensionConfig('framework', [
