@@ -1,0 +1,4 @@
+# 空的路由配置文件
+# 用于 symfony-integration-test-kernel 包的测试环境
+# 此文件用于满足某些 Bundle 对路由配置的要求
+# 具体的路由应该由各自的测试在测试类中动态配置
