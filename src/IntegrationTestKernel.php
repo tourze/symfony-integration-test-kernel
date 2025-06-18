@@ -2,6 +2,7 @@
 
 namespace Tourze\IntegrationTestKernel;
 
+use Closure;
 use Composer\InstalledVersions;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Tools\SchemaTool;
@@ -22,7 +23,8 @@ use Tourze\BundleDependency\ResolveHelper;
  * - 支持动态添加实体映射
  * - 自动解析 Bundle 依赖
  * - 提供临时缓存和日志目录
- * - 支持基础框架配置documented class
+ * - 支持基础框架配置
+ * - 支持容器编译阶段的自定义回调
  */
 class IntegrationTestKernel extends BaseKernel
 {
@@ -43,12 +45,16 @@ class IntegrationTestKernel extends BaseKernel
      *         'Tourze\Bundle\Tests\Entity' => __DIR__ . '/../Entity',
      *         'Tourze\Other\Entity' => '/path/to/entity/dir'
      *     ]
+     * @param Closure|null $containerConfigurator 容器配置回调，在 configureContainer 时调用
+     * @param Closure|null $containerBuilder 容器构建回调，在 build 时调用
      */
     public function __construct(
         string $environment,
         bool $debug,
         private readonly array $appendBundles = [],
-        private readonly array $entityMappings = []
+        private readonly array $entityMappings = [],
+        private readonly ?Closure $containerConfigurator = null,
+        private readonly ?Closure $containerBuilder = null
     ) {
         parent::__construct($environment, $debug);
         $this->hash = md5(json_encode([
@@ -56,6 +62,8 @@ class IntegrationTestKernel extends BaseKernel
             $debug,
             $this->appendBundles,
             $this->entityMappings,
+            $this->containerConfigurator !== null,
+            $this->containerBuilder !== null,
         ]));
     }
 
@@ -83,6 +91,16 @@ class IntegrationTestKernel extends BaseKernel
     public function getLogDir(): string
     {
         return sys_get_temp_dir() . "/{$this->getHash()}/var/log";
+    }
+
+    protected function build(ContainerBuilder $container): void
+    {
+        parent::build($container);
+
+        // 执行自定义的容器构建回调
+        if ($this->containerBuilder !== null) {
+            ($this->containerBuilder)($container, $this);
+        }
     }
 
     protected function configureContainer(ContainerBuilder $container): void
@@ -183,6 +201,11 @@ class IntegrationTestKernel extends BaseKernel
             }
 
             $container->prependExtensionConfig('doctrine', $doctrineConfig);
+        }
+
+        // 执行自定义的容器配置回调
+        if ($this->containerConfigurator !== null) {
+            ($this->containerConfigurator)($container, $this);
         }
     }
 
