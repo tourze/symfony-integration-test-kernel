@@ -44,7 +44,7 @@ class IntegrationTestKernelEdgeCasesTest extends TestCase
 
         // 确保缓存目录路径是有效的
         $cacheDir = $kernel->getCacheDir();
-        $this->assertIsString($cacheDir);
+        $this->assertNotEmpty($cacheDir);
         $this->assertStringContainsString('test-special_env.1', $cacheDir);
     }
 
@@ -89,7 +89,7 @@ class IntegrationTestKernelEdgeCasesTest extends TestCase
         $cacheDir = $kernel->getCacheDir();
 
         // 验证路径仍然有效
-        $this->assertIsString($cacheDir);
+        $this->assertNotEmpty($cacheDir);
         $this->assertStringContainsString(sys_get_temp_dir(), $cacheDir);
     }
 
@@ -100,7 +100,7 @@ class IntegrationTestKernelEdgeCasesTest extends TestCase
 
         $logDir = $kernel->getLogDir();
 
-        $this->assertIsString($logDir);
+        $this->assertNotEmpty($logDir);
         $this->assertStringContainsString(sys_get_temp_dir(), $logDir);
         $this->assertStringContainsString('/var/log', $logDir);
     }
@@ -121,7 +121,7 @@ class IntegrationTestKernelEdgeCasesTest extends TestCase
 
         // 验证哈希包含了所有映射信息
         $cacheDir = $kernel->getCacheDir();
-        $this->assertIsString($cacheDir);
+        $this->assertNotEmpty($cacheDir);
     }
 
     public function test_kernel_debugModeAffectsHash(): void
@@ -144,7 +144,7 @@ class IntegrationTestKernelEdgeCasesTest extends TestCase
 
         // 验证哈希生成不会出错
         $cacheDir = $kernel->getCacheDir();
-        $this->assertIsString($cacheDir);
+        $this->assertNotEmpty($cacheDir);
     }
 
     public function test_kernel_withArrayParametersOrder(): void

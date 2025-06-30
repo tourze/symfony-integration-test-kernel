@@ -40,17 +40,6 @@ class IntegrationTestKernelContainerConfigurationTest extends TestCase
         $this->assertTrue($mergedConfig['php_errors']['log']);
     }
 
-    public function test_configureContainer_setsUidConfigurationWhenSymfonyUidInstalled(): void
-    {
-        // 模拟 symfony/uid 已安装的情况需要实际的包存在，这里跳过
-        $this->markTestSkipped('需要实际安装 symfony/uid 包才能测试');
-    }
-
-    public function test_configureContainer_setsValidationConfigurationWhenValidatorInstalled(): void
-    {
-        // 模拟 symfony/validator 已安装的情况需要实际的包存在，这里跳过
-        $this->markTestSkipped('需要实际安装 symfony/validator 包才能测试');
-    }
 
     public function test_configureContainer_setsRouterConfigurationWhenEasyAdminExtensionExists(): void
     {

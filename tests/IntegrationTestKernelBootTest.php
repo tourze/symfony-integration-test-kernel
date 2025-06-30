@@ -72,24 +72,15 @@ class IntegrationTestKernelBootTest extends TestCase
             $this->assertSame('test', $kernel->getContainer()->getParameter('kernel.environment'));
         } finally {
             // 清理
-            if ($kernel->getContainer() !== null) {
+            try {
+                $kernel->getContainer();
                 $kernel->shutdown();
+            } catch (\LogicException $e) {
+                // 内核未启动，忽略
             }
         }
     }
 
-    public function test_boot_withDoctrineBundle_createsSchema(): void
-    {
-        // 这个测试需要真实的 Doctrine 环境，比较复杂
-        $this->markTestSkipped('需要完整的 Doctrine 环境才能测试 schema 创建');
-    }
-
-    public function test_boot_withDoctrineBundle_handlesToolsException(): void
-    {
-        // 这个测试需要模拟 ToolsException，但由于 createDatabaseSchema 是私有方法
-        // 并且依赖于容器中的服务，测试比较复杂
-        $this->markTestSkipped('需要模拟复杂的 Doctrine 环境才能测试异常处理');
-    }
 
     public function test_boot_withoutDoctrineBundle_doesNotCreateSchema(): void
     {
@@ -102,8 +93,11 @@ class IntegrationTestKernelBootTest extends TestCase
             $bundles = $kernel->getContainer()->getParameter('kernel.bundles');
             $this->assertArrayNotHasKey('DoctrineBundle', $bundles);
         } finally {
-            if ($kernel->getContainer() !== null) {
+            try {
+                $kernel->getContainer();
                 $kernel->shutdown();
+            } catch (\LogicException $e) {
+                // 内核未启动，忽略
             }
         }
     }
@@ -121,7 +115,7 @@ class IntegrationTestKernelBootTest extends TestCase
 
         $projectDir = $kernel->getProjectDir();
 
-        $this->assertIsString($projectDir);
+        $this->assertNotEmpty($projectDir);
         $this->assertTrue(is_dir($projectDir));
     }
 
@@ -131,7 +125,7 @@ class IntegrationTestKernelBootTest extends TestCase
 
         try {
             $kernel->boot();
-            $this->assertTrue($kernel->getContainer() !== null);
+            $this->assertNotNull($kernel->getContainer());
 
             $kernel->shutdown();
 
